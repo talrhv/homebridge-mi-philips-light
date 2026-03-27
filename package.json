@@ -1,7 +1,8 @@
 {
-  "name": "homebridge-mi-philips-light",
+  "name": "@talrhv/homebridge-mi-philips-light",
+  "displayName": "Mi Philips Light (Matter & HB2)",
   "version": "1.0.0",
-  "description": "XiaoMi Philips light plugin for Homebridge 1.x, 2.0 and Matter.",
+  "description": "XiaoMi Philips light plugin for Homebridge 1.x, 2.0 and Matter support.",
   "keywords": [
     "homebridge-plugin",
     "matter",
@@ -14,6 +15,9 @@
     "ceiling"
   ],
   "author": "Tal Rahav",
+  "maintainers": [
+    "talrhv"
+  ],
   "homepage": "https://github.com/talrhv/homebridge-mi-philips-light",
   "repository": {
     "type": "git",
