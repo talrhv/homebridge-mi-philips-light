@@ -2,7 +2,6 @@
 import MiPhilipsSmartBulb from "./Devices/MiPhilipsSmartBulb.mjs";
 import MiPhilipsTableLamp2 from "./Devices/MiPhilipsTableLamp2.mjs";
 import MiPhilipsCeilingLamp from "./Devices/MiPhilipsCeilingLamp.mjs";
-import { version } from "./package.json";
 
 export default (api) => {
   // This registration is compatible with HB 1.x and 2.x
@@ -20,10 +19,6 @@ class MiPhilipsLightPlatform {
 
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
-
-    this.log.info(
-      `[MiPhilipsLightPlatform] Initializing v${version} (HB 1.x/2.x & Matter Compatible)`,
-    );
   }
 
   // Dynamic accessory registration
