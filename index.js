@@ -1,106 +1,56 @@
-require('./Devices/MiPhilipsSmartBulb');
-require('./Devices/MiPhilipsTableLamp2');
-require('./Devices/MiPhilipsCeilingLamp');
+// index.js
+const MiPhilipsSmartBulb = require("./Devices/MiPhilipsSmartBulb");
+const MiPhilipsTableLamp2 = require("./Devices/MiPhilipsTableLamp2");
+const MiPhilipsCeilingLamp = require("./Devices/MiPhilipsCeilingLamp");
+const packageFile = require("./package.json");
 
-var fs = require('fs');
-var packageFile = require("./package.json");
-var PlatformAccessory, Accessory, Service, Characteristic, UUIDGen;
+module.exports = (api) => {
+  // This registration is compatible with HB 1.x and 2.x
+  api.registerPlatform("MiPhilipsLightPlatform", MiPhilipsLightPlatform);
+};
 
-module.exports = function(homebridge) {
-    if(!isConfig(homebridge.user.configPath(), "platforms", "MiPhilipsLightPlatform")) {
-        return;
-    }
-    
-    PlatformAccessory = homebridge.platformAccessory;
-    Accessory = homebridge.hap.Accessory;
-    Service = homebridge.hap.Service;
-    Characteristic = homebridge.hap.Characteristic;
-    UUIDGen = homebridge.hap.uuid;
-
-    homebridge.registerPlatform('homebridge-mi-philips-light', 'MiPhilipsLightPlatform', MiPhilipsLightPlatform, true);
-}
-
-function isConfig(configFile, type, name) {
-    var config = JSON.parse(fs.readFileSync(configFile));
-    if("accessories" === type) {
-        var accessories = config.accessories;
-        for(var i in accessories) {
-            if(accessories[i]['accessory'] === name) {
-                return true;
-            }
-        }
-    } else if("platforms" === type) {
-        var platforms = config.platforms;
-        for(var i in platforms) {
-            if(platforms[i]['platform'] === name) {
-                return true;
-            }
-        }
-    } else {
-    }
-    
-    return false;
-}
-
-function MiPhilipsLightPlatform(log, config, api) {
-    if(null == config) {
-        return;
-    }
-    
-    this.Accessory = Accessory;
-    this.PlatformAccessory = PlatformAccessory;
-    this.Service = Service;
-    this.Characteristic = Characteristic;
-    this.UUIDGen = UUIDGen;
-    
+class MiPhilipsLightPlatform {
+  constructor(log, config, api) {
     this.log = log;
     this.config = config;
+    this.api = api;
 
-    if (api) {
-        this.api = api;
-    }
-    
-    
-    this.log.info("[MiPhilipsLightPlatform][INFO]********************************************************************");
-    this.log.info("[MiPhilipsLightPlatform][INFO]          MiPhilipsLightPlatform v%s By YinHang", packageFile.version);
-    this.log.info("[MiPhilipsLightPlatform][INFO] GitHub: https://github.com/YinHangCode/homebridge-mi-philips-light ");
-    this.log.info("[MiPhilipsLightPlatform][INFO]                                                QQ Group: 107927710 ");
-    this.log.info("[MiPhilipsLightPlatform][INFO]********************************************************************");
-    this.log.info("[MiPhilipsLightPlatform][INFO]start success...");
-    
-}
+    // If config is null, the plugin is likely not configured yet
+    if (!config) return;
 
-MiPhilipsLightPlatform.prototype = {
-    accessories: function(callback) {
-        var myAccessories = [];
+    this.Service = api.hap.Service;
+    this.Characteristic = api.hap.Characteristic;
 
-        var deviceCfgs = this.config['deviceCfgs'];
-        
-        if(deviceCfgs instanceof Array) {
-            for (var i = 0; i < deviceCfgs.length; i++) {
-                var deviceCfg = deviceCfgs[i];
-                if(null == deviceCfg['type'] || "" == deviceCfg['type'] || null == deviceCfg['token'] || "" == deviceCfg['token'] || null == deviceCfg['ip'] || "" == deviceCfg['ip']) {
-                    continue;
-                }
-                
-                if (deviceCfg['type'] == "MiPhilipsSmartBulb") {
-                    new MiPhilipsSmartBulb(this, deviceCfg).forEach(function(accessory, index, arr){
-                        myAccessories.push(accessory);
-                    });
-                } else if (deviceCfg['type'] == "MiPhilipsTableLamp2") {
-                    new MiPhilipsTableLamp2(this, deviceCfg).forEach(function(accessory, index, arr){
-                        myAccessories.push(accessory);
-                    });
-                } else if (deviceCfg['type'] == "MiPhilipsCeilingLamp") {
-                    new MiPhilipsCeilingLamp(this, deviceCfg).forEach(function(accessory, index, arr){
-                        myAccessories.push(accessory);
-                    });
-                } else {
-                }
-            }
-            this.log.info("[MiPhilipsLightPlatform][INFO]device size: " + deviceCfgs.length + ", accessories size: " + myAccessories.length);
+    this.log.info(
+      `[MiPhilipsLightPlatform] Initializing v${packageFile.version} (HB 1.x/2.x & Matter Compatible)`,
+    );
+  }
+
+  // Dynamic accessory registration
+  accessories(callback) {
+    const myAccessories = [];
+    const deviceCfgs = this.config["deviceCfgs"];
+
+    if (Array.isArray(deviceCfgs)) {
+      deviceCfgs.forEach((deviceCfg) => {
+        if (!deviceCfg.type || !deviceCfg.token || !deviceCfg.ip) return;
+
+        try {
+          if (deviceCfg.type === "MiPhilipsSmartBulb") {
+            myAccessories.push(...new MiPhilipsSmartBulb(this, deviceCfg));
+          } else if (deviceCfg.type === "MiPhilipsTableLamp2") {
+            myAccessories.push(...new MiPhilipsTableLamp2(this, deviceCfg));
+          } else if (deviceCfg.type === "MiPhilipsCeilingLamp") {
+            myAccessories.push(...new MiPhilipsCeilingLamp(this, deviceCfg));
+          }
+        } catch (err) {
+          this.log.error(
+            `Failed to load device ${deviceCfg.type}: ${err.message}`,
+          );
         }
-
-        callback(myAccessories);
+      });
     }
+
+    callback(myAccessories);
+  }
 }

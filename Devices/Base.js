@@ -1,17 +1,18 @@
-// Base
-Base = function() {
+// Base.js
+class Base {
+  constructor() {
     this.platform = null;
-}
+    this.config = null;
+  }
 
-Base.prototype.init = function(platform, config) {
+  init(platform, config) {
     this.platform = platform;
     this.config = config;
+  }
+
+  obj2array(obj) {
+    return Object.values(obj);
+  }
 }
 
-Base.prototype.obj2array = function(obj) {
-    var array = [];
-    for(var item in obj) {
-        array.push(obj[item]);
-    }
-    return array;
-}
+module.exports = Base;
