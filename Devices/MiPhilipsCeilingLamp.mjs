@@ -1,4 +1,4 @@
-// Devices/MiPhilipsCeilingLamp.js
+// Devices/MiPhilipsCeilingLamp.mjs
 import Base from "./Base.mjs";
 import { Device } from "miio";
 
@@ -59,21 +59,27 @@ class MiPhilipsCeilingLampLight {
       });
 
     this.Lampservice.addCharacteristic(Characteristic.Brightness)
-      .onGet(async () => (await this.device.call("get_prop", ["bright"]))[0])
+      .onGet(async () => {
+        const res = await this.device.call("get_prop", ["bright"]);
+        return res[0];
+      })
       .onSet(async (value) => {
         if (value > 0) await this.device.call("set_bright", [value]);
       });
 
+    // UI Fix: Use standard Apple HomeKit Mired bounds (140-500)
     this.Lampservice.addCharacteristic(Characteristic.ColorTemperature)
-      .setProps({ minValue: 50, maxValue: 400, minStep: 1 })
+      .setProps({ minValue: 140, maxValue: 500, minStep: 1 })
       .onGet(async () => {
         const res = await this.device.call("get_prop", ["cct"]);
-        return res[0] < 1 ? 400 - res[0] * 350 : 400 - res[0] * 3.5;
+        let cct = res[0] <= 1 ? res[0] * 100 : res[0];
+        let mired = Math.round(400 - cct * 2.6);
+        return Math.max(140, Math.min(500, mired));
       })
       .onSet(async (value) => {
-        let mappedValue = Math.round(100 - ((value - 50) / 350) * 100);
-        if (mappedValue === 0) mappedValue = 1;
-        await this.device.call("set_cct", [mappedValue]);
+        let cct = Math.round((400 - value) / 2.6);
+        cct = Math.max(1, Math.min(100, cct));
+        await this.device.call("set_cct", [cct]);
       });
 
     services.push(this.Lampservice);
@@ -108,4 +114,5 @@ class MiPhilipsCeilingLampLight {
     }
   }
 }
+
 export default MiPhilipsCeilingLamp;

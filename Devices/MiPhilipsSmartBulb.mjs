@@ -1,4 +1,4 @@
-// Devices/MiPhilipsSmartBulb.js
+// Devices/MiPhilipsSmartBulb.mjs
 import Base from "./Base.mjs";
 import { Device } from "miio";
 
@@ -56,9 +56,10 @@ class MiPhilipsSmartBulbLight {
       .onGet(this.getBrightness.bind(this))
       .onSet(this.setBrightness.bind(this));
 
+    // UI Fix: Use standard Apple HomeKit Mired bounds (140-500)
     lightService
       .addCharacteristic(Characteristic.ColorTemperature)
-      .setProps({ minValue: 50, maxValue: 400, minStep: 1 })
+      .setProps({ minValue: 140, maxValue: 500, minStep: 1 })
       .onGet(this.getColorTemperature.bind(this))
       .onSet(this.setColorTemperature.bind(this));
 
@@ -118,7 +119,12 @@ class MiPhilipsSmartBulbLight {
   async getColorTemperature() {
     try {
       const result = await this.device.call("get_prop", ["cct"]);
-      return result[0] < 1 ? 400 - result[0] * 350 : 400 - result[0] * 3.5;
+      // Normalize to 1-100 scale (some firmware returns 0.01-1.00)
+      let cct = result[0] <= 1 ? result[0] * 100 : result[0];
+
+      // Map Xiaomi's 1-100 to Apple's 140-500 Mireds safely
+      let mired = Math.round(400 - cct * 2.6);
+      return Math.max(140, Math.min(500, mired));
     } catch (err) {
       throw new this.platform.api.hap.HapStatusError(
         this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
@@ -127,13 +133,12 @@ class MiPhilipsSmartBulbLight {
   }
 
   async setColorTemperature(value) {
-    let mappedValue = value - 50;
-    mappedValue = (mappedValue / 350) * 100;
-    mappedValue = Math.round(100 - mappedValue);
-    if (mappedValue === 0) mappedValue = 1;
+    // Map Apple's 140-500 Mireds back to Xiaomi's 1-100 scale
+    let cct = Math.round((400 - value) / 2.6);
+    cct = Math.max(1, Math.min(100, cct));
 
     try {
-      const result = await this.device.call("set_cct", [mappedValue]);
+      const result = await this.device.call("set_cct", [cct]);
       if (result[0] !== "ok") throw new Error(result[0]);
     } catch (err) {
       throw new this.platform.api.hap.HapStatusError(
@@ -142,4 +147,5 @@ class MiPhilipsSmartBulbLight {
     }
   }
 }
+
 export default MiPhilipsSmartBulb;
