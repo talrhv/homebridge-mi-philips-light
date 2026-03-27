@@ -1,12 +1,12 @@
 // Devices/MiPhilipsTableLamp2.js
-const Base = require("../Base");
-const miio = require("miio");
+import Base from "../Base";
+import { Device } from "miio";
 
 class MiPhilipsTableLamp2 extends Base {
   constructor(platform, config) {
     super();
     this.init(platform, config);
-    this.device = new miio.Device({
+    this.device = new Device({
       address: this.config["ip"],
       token: this.config["token"],
     });
@@ -128,4 +128,4 @@ class MiPhilipsTableLamp2Light {
     return services;
   }
 }
-module.exports = MiPhilipsTableLamp2;
+export default MiPhilipsTableLamp2;

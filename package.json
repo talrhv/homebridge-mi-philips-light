@@ -2,6 +2,7 @@
   "name": "@talrhv/homebridge-mi-philips-light",
   "displayName": "Mi Philips Light (Matter & HB2)",
   "version": "1.0.0",
+  "type": "module",
   "description": "XiaoMi Philips light plugin for Homebridge 1.x, 2.0 and Matter support.",
   "keywords": [
     "homebridge-plugin",

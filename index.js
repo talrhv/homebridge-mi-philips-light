@@ -1,10 +1,10 @@
 // index.js
-const MiPhilipsSmartBulb = require("./Devices/MiPhilipsSmartBulb");
-const MiPhilipsTableLamp2 = require("./Devices/MiPhilipsTableLamp2");
-const MiPhilipsCeilingLamp = require("./Devices/MiPhilipsCeilingLamp");
-const packageFile = require("./package.json");
+import MiPhilipsSmartBulb from "./Devices/MiPhilipsSmartBulb";
+import MiPhilipsTableLamp2 from "./Devices/MiPhilipsTableLamp2";
+import MiPhilipsCeilingLamp from "./Devices/MiPhilipsCeilingLamp";
+import { version } from "./package.json";
 
-module.exports = (api) => {
+export default (api) => {
   // This registration is compatible with HB 1.x and 2.x
   api.registerPlatform("MiPhilipsLightPlatform", MiPhilipsLightPlatform);
 };
@@ -22,7 +22,7 @@ class MiPhilipsLightPlatform {
     this.Characteristic = api.hap.Characteristic;
 
     this.log.info(
-      `[MiPhilipsLightPlatform] Initializing v${packageFile.version} (HB 1.x/2.x & Matter Compatible)`,
+      `[MiPhilipsLightPlatform] Initializing v${version} (HB 1.x/2.x & Matter Compatible)`,
     );
   }
 

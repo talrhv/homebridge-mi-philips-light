@@ -1,13 +1,13 @@
 // Devices/MiPhilipsSmartBulb.js
-const Base = require("../Base");
-const miio = require("miio");
+import Base from "../Base";
+import { Device } from "miio";
 
 class MiPhilipsSmartBulb extends Base {
   constructor(platform, config) {
     super();
     this.init(platform, config);
 
-    this.device = new miio.Device({
+    this.device = new Device({
       address: this.config["ip"],
       token: this.config["token"],
     });
@@ -142,4 +142,4 @@ class MiPhilipsSmartBulbLight {
     }
   }
 }
-module.exports = MiPhilipsSmartBulb;
+export default MiPhilipsSmartBulb;
