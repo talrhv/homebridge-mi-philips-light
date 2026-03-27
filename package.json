@@ -14,13 +14,13 @@
     "ceiling"
   ],
   "author": "Tal Rahav",
-  "homepage": "https://github.com/talrahav/homebridge-mi-philips-light",
+  "homepage": "https://github.com/talrhv/homebridge-mi-philips-light",
   "repository": {
     "type": "git",
-    "url": "https://github.com/talrahav/homebridge-mi-philips-light"
+    "url": "https://github.com/talrhv/homebridge-mi-philips-light"
   },
   "bugs": {
-    "url": "https://github.com/talrahav/homebridge-mi-philips-light/issues"
+    "url": "https://github.com/talrhv/homebridge-mi-philips-light/issues"
   },
   "engines": {
     "node": ">=18.15.0",
