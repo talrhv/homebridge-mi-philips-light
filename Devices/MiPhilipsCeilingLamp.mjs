@@ -1,5 +1,5 @@
 // Devices/MiPhilipsCeilingLamp.js
-import Base from "../Base";
+import Base from "./Base.mjs";
 import { Device } from "miio";
 
 class MiPhilipsCeilingLamp extends Base {

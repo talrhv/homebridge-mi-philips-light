@@ -1,5 +1,5 @@
 // Devices/MiPhilipsTableLamp2.js
-import Base from "../Base";
+import Base from "./Base.mjs";
 import { Device } from "miio";
 
 class MiPhilipsTableLamp2 extends Base {

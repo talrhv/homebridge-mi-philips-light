@@ -1,7 +1,7 @@
 // index.js
-import MiPhilipsSmartBulb from "./Devices/MiPhilipsSmartBulb";
-import MiPhilipsTableLamp2 from "./Devices/MiPhilipsTableLamp2";
-import MiPhilipsCeilingLamp from "./Devices/MiPhilipsCeilingLamp";
+import MiPhilipsSmartBulb from "./Devices/MiPhilipsSmartBulb.mjs";
+import MiPhilipsTableLamp2 from "./Devices/MiPhilipsTableLamp2.mjs";
+import MiPhilipsCeilingLamp from "./Devices/MiPhilipsCeilingLamp.mjs";
 import { version } from "./package.json";
 
 export default (api) => {

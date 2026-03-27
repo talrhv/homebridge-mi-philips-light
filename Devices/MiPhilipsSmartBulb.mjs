@@ -1,5 +1,5 @@
 // Devices/MiPhilipsSmartBulb.js
-import Base from "../Base";
+import Base from "./Base.mjs";
 import { Device } from "miio";
 
 class MiPhilipsSmartBulb extends Base {
