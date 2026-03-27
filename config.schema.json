@@ -1,0 +1,137 @@
+{
+  "pluginAlias": "MiPhilipsLightPlatform",
+  "pluginType": "platform",
+  "headerDisplay": "Mi Philips Light (Matter & HB2 Support)",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Platform Name",
+        "type": "string",
+        "default": "MiPhilipsLightPlatform",
+        "required": true
+      },
+      "deviceCfgs": {
+        "title": "Philips Light Devices",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "title": "Device Type",
+              "type": "string",
+              "default": "MiPhilipsCeilingLamp",
+              "oneOf": [
+                { "title": "Ceiling Lamp", "enum": ["MiPhilipsCeilingLamp"] },
+                { "title": "Smart Bulb", "enum": ["MiPhilipsSmartBulb"] },
+                {
+                  "title": "Table Lamp 2 (Eyecare)",
+                  "enum": ["MiPhilipsTableLamp2"]
+                }
+              ],
+              "required": true
+            },
+            "ip": {
+              "title": "IP Address",
+              "type": "string",
+              "format": "ipv4",
+              "required": true
+            },
+            "token": {
+              "title": "Device Token",
+              "type": "string",
+              "required": true
+            },
+            "lightName": {
+              "title": "Accessory Name",
+              "type": "string",
+              "description": "Name for Ceiling Lamp or Smart Bulb",
+              "condition": {
+                "functionBody": "return model.type === 'MiPhilipsCeilingLamp' || model.type === 'MiPhilipsSmartBulb';"
+              }
+            },
+            "mainLightName": {
+              "title": "Main Lamp Name",
+              "type": "string",
+              "description": "Primary name for the Table Lamp 2",
+              "condition": {
+                "functionBody": "return model.type === 'MiPhilipsTableLamp2';"
+              }
+            },
+            "lightDisable": {
+              "title": "Disable Accessory",
+              "type": "boolean",
+              "default": false,
+              "condition": {
+                "functionBody": "return model.type === 'MiPhilipsCeilingLamp' || model.type === 'MiPhilipsSmartBulb';"
+              }
+            },
+            "updatetimer": {
+              "title": "Enable Background Polling",
+              "type": "boolean",
+              "default": false,
+              "description": "Check device state periodically (best for Ceiling Lamps)"
+            },
+            "interval": {
+              "title": "Polling Interval (seconds)",
+              "type": "integer",
+              "default": 3,
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return model.updatetimer === true;"
+              }
+            },
+            "secondLightDisable": {
+              "title": "Disable Ambient Light",
+              "type": "boolean",
+              "default": false,
+              "condition": {
+                "functionBody": "return model.type === 'MiPhilipsTableLamp2';"
+              }
+            },
+            "eyecareSwitchDisable": {
+              "title": "Disable Eyecare Switch",
+              "type": "boolean",
+              "default": false,
+              "condition": {
+                "functionBody": "return model.type === 'MiPhilipsTableLamp2';"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "layout": [
+    "name",
+    {
+      "type": "fieldset",
+      "title": "Devices",
+      "expandable": false,
+      "items": [
+        {
+          "key": "deviceCfgs",
+          "type": "array",
+          "items": [
+            "deviceCfgs[].type",
+            "deviceCfgs[].ip",
+            "deviceCfgs[].token",
+            "deviceCfgs[].lightName",
+            "deviceCfgs[].mainLightName",
+            {
+              "type": "expansionPanels",
+              "title": "Advanced Settings",
+              "items": [
+                "deviceCfgs[].lightDisable",
+                "deviceCfgs[].updatetimer",
+                "deviceCfgs[].interval",
+                "deviceCfgs[].secondLightDisable",
+                "deviceCfgs[].eyecareSwitchDisable"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

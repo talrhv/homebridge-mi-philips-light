@@ -1,4 +1,4 @@
-// Devices/MiPhilipsTableLamp2.js
+// Devices/MiPhilipsTableLamp2.mjs
 import Base from "./Base.mjs";
 import { Device } from "miio";
 
@@ -69,22 +69,50 @@ class MiPhilipsTableLamp2Light {
     // Main Light
     this.mainLightOnCharacteristic
       .onGet(async () => {
-        const res = await this.device.call("get_prop", ["power"]);
-        return res[0] === "on";
+        try {
+          const res = await this.device.call("get_prop", ["power"]);
+          return res[0] === "on";
+        } catch (err) {
+          throw new this.platform.api.hap.HapStatusError(
+            this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+          );
+        }
       })
       .onSet(async (value) => {
-        await this.device.call("set_power", [value ? "on" : "off"]);
-        if (!value) {
-          this.secondLightOnCharacteristic.updateValue(false);
-          this.eyecareSwitchOnCharacteristic.updateValue(false);
+        try {
+          await this.device.call("set_power", [value ? "on" : "off"]);
+          if (!value) {
+            this.secondLightOnCharacteristic.updateValue(false);
+            this.eyecareSwitchOnCharacteristic.updateValue(false);
+          }
+        } catch (err) {
+          throw new this.platform.api.hap.HapStatusError(
+            this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+          );
         }
       });
 
     mainLightService
       .addCharacteristic(Characteristic.Brightness)
-      .onGet(async () => (await this.device.call("get_prop", ["bright"]))[0])
+      .onGet(async () => {
+        try {
+          const res = await this.device.call("get_prop", ["bright"]);
+          return res[0];
+        } catch (err) {
+          throw new this.platform.api.hap.HapStatusError(
+            this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+          );
+        }
+      })
       .onSet(async (value) => {
-        if (value > 0) await this.device.call("set_bright", [value]);
+        if (value === 0) return;
+        try {
+          await this.device.call("set_bright", [value]);
+        } catch (err) {
+          throw new this.platform.api.hap.HapStatusError(
+            this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+          );
+        }
       });
 
     services.push(mainLightService);
@@ -93,20 +121,46 @@ class MiPhilipsTableLamp2Light {
     if (!this.secondLightDisable) {
       this.secondLightOnCharacteristic
         .onGet(async () => {
-          const res = await this.device.call("get_prop", ["ambstatus"]);
-          return res[0] === "on" && this.mainLightOnCharacteristic.value;
+          try {
+            const res = await this.device.call("get_prop", ["ambstatus"]);
+            return res[0] === "on" && this.mainLightOnCharacteristic.value;
+          } catch (err) {
+            throw new this.platform.api.hap.HapStatusError(
+              this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+            );
+          }
         })
         .onSet(async (value) => {
-          await this.device.call("enable_amb", [value ? "on" : "off"]);
+          try {
+            await this.device.call("enable_amb", [value ? "on" : "off"]);
+          } catch (err) {
+            throw new this.platform.api.hap.HapStatusError(
+              this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+            );
+          }
         });
 
       secondLightService
         .addCharacteristic(Characteristic.Brightness)
-        .onGet(
-          async () => (await this.device.call("get_prop", ["ambvalue"]))[0],
-        )
+        .onGet(async () => {
+          try {
+            const res = await this.device.call("get_prop", ["ambvalue"]);
+            return res[0];
+          } catch (err) {
+            throw new this.platform.api.hap.HapStatusError(
+              this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+            );
+          }
+        })
         .onSet(async (value) => {
-          if (value > 0) await this.device.call("set_amb_bright", [value]);
+          if (value === 0) return;
+          try {
+            await this.device.call("set_amb_bright", [value]);
+          } catch (err) {
+            throw new this.platform.api.hap.HapStatusError(
+              this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+            );
+          }
         });
 
       services.push(secondLightService);
@@ -116,11 +170,23 @@ class MiPhilipsTableLamp2Light {
     if (!this.eyecareSwitchDisable) {
       this.eyecareSwitchOnCharacteristic
         .onGet(async () => {
-          const res = await this.device.call("get_prop", ["eyecare"]);
-          return res[0] === "on" && this.mainLightOnCharacteristic.value;
+          try {
+            const res = await this.device.call("get_prop", ["eyecare"]);
+            return res[0] === "on" && this.mainLightOnCharacteristic.value;
+          } catch (err) {
+            throw new this.platform.api.hap.HapStatusError(
+              this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+            );
+          }
         })
         .onSet(async (value) => {
-          await this.device.call("set_eyecare", [value ? "on" : "off"]);
+          try {
+            await this.device.call("set_eyecare", [value ? "on" : "off"]);
+          } catch (err) {
+            throw new this.platform.api.hap.HapStatusError(
+              this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE,
+            );
+          }
         });
       services.push(eyecareSwitchService);
     }
